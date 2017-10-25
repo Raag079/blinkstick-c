@@ -28,21 +28,25 @@ rgb_color* parse_args(char **flags) {
 
 int main(int argc, char **argv) {
   rgb_color *color = parse_args(argv);
-  blinkstick_device *device = find_blinkstick();
+  int number_of_devices = 2;
+  blinkstick_device_list *devices = blinkstick_list_factory(number_of_devices);
 
-  int i;
+  find_blinksticks(devices);
 
-  if (device) {
-    for(i = 0; i < 8; i++)
-    {
-      set_color(i, color, device);
-      usleep(1000);
-      off(i, device);
-      usleep(10000);
+  int i, j;
+  for(i = 0; i < number_of_devices; i++)
+  {
+    if(devices->blinkstick_device_list[i] != NULL) {
+      for(j = 0; j < 8; j++)
+      {
+        set_color(j, color, devices->blinkstick_device_list[i]);
+        usleep(20000);
+        off(j, devices->blinkstick_device_list[i]);
+        usleep(20000);
+      }
     }
-    destroy_color(color);
-    destroy_blinkstick(device);
   }
-
+  destroy_color(color);
+  destroy_blinksticks(devices);
   return 0;
 }
